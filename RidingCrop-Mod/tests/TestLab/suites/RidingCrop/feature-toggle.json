@@ -45,7 +45,7 @@
     {
       "do": "setConfig",
       "values": {
-        "Crops/Enable": false
+        "General/Enable Crops": false
       }
     },
     {
@@ -67,12 +67,12 @@
         "id": "sounds"
       },
       "expect": true,
-      "label": "sounds unaffected by Crops/Enable"
+      "label": "General/Enable sounds unaffected by Crops"
     },
     {
       "do": "setConfig",
       "values": {
-        "Crops/Enable": true
+        "General/Enable Crops": true
       }
     },
     {
@@ -90,7 +90,7 @@
     {
       "do": "setConfig",
       "values": {
-        "Sound/Enable": false
+        "General/Enable Sound": false
       }
     },
     {
@@ -112,12 +112,12 @@
         "id": "crops"
       },
       "expect": true,
-      "label": "crops unaffected by Sound/Enable"
+      "label": "General/Enable crops unaffected by Sound"
     },
     {
       "do": "setConfig",
       "values": {
-        "Sound/Enable": true
+        "General/Enable Sound": true
       }
     },
     {
@@ -135,7 +135,7 @@
     {
       "do": "setConfig",
       "values": {
-        "General/EnableAll": false
+        "General/Enable mod": false
       }
     },
     {
@@ -177,7 +177,7 @@
     {
       "do": "setConfig",
       "values": {
-        "General/EnableAll": true
+        "General/Enable mod": true
       }
     },
     {

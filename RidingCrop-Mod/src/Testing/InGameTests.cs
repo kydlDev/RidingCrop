@@ -12,14 +12,14 @@ internal static class InGameTests
 {
     private static string Startup_ConfigBound()
     {
-        if (ModSettings.EnableAll == null || ModSettings.DebugLog == null)
+        if (ModSettings.EnableMod == null || ModSettings.DebugLog == null)
         {
-            return "FAIL: ModSettings.Bind did not run (EnableAll / DebugLog null)";
+            return "FAIL: ModSettings.Bind did not run (EnableMod / DebugLog null)";
         }
 
         string r = ModSettings.On
-            ? "PASS: EnableAll on, crops " + ModSettings.CropsOn + ", sounds " + ModSettings.SoundsOn + ", debug log " + ModSettings.DebugLog.Value
-            : "SKIP: EnableAll is off in the config";
+            ? "PASS: EnableMod on, crops " + ModSettings.CropsOn + ", sounds " + ModSettings.SoundsOn + ", debug log " + ModSettings.DebugLog.Value
+            : "SKIP: EnableMod is off in the config";
         ModLog.Verbose("InGameTests: Startup_ConfigBound -> " + r);
         return r;
     }

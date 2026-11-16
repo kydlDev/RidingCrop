@@ -5,7 +5,7 @@ using KydlCore.Core;
 namespace RidingCrop;
 
 /// <summary>
-/// The seven crops and their skill. Gate: EnableAll and [Crops] Enable. Items and the skill cannot be added or removed while the game runs,
+/// The seven crops and their skill. Gate: EnableMod and [Crops] Enable. Items and the skill cannot be added or removed while the game runs,
 /// so they are registered once during startup; a switch changed later only changes <see cref="Running"/> (the README says: restart).
 /// </summary>
 internal sealed class CropsFeature : IFeature

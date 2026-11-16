@@ -7,7 +7,7 @@ namespace RidingCrop;
 
 /// <summary>
 /// 1.0.0 had [General] Enabled and [General] DebugLogging in the same config file. Their values are carried over once to
-/// [General] EnableAll and [DebugLog] Enable, then the old lines are dropped from the file.
+/// [General] Enable mod and [DebugLog] Enable, then the old lines are dropped from the file.
 /// </summary>
 internal static class ConfigMigration
 {
@@ -15,7 +15,7 @@ internal static class ConfigMigration
     /// <param name="config">The plugin's config file.</param>
     internal static void Run(ConfigFile config)
     {
-        bool changed = Import(config, "Enabled", ModSettings.EnableAll);
+        bool changed = Import(config, "Enabled", ModSettings.EnableMod);
         changed |= Import(config, "DebugLogging", ModSettings.DebugLog);
         if (changed)
         {

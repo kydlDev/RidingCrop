@@ -4,30 +4,30 @@
   "requireMods": [
     {
       "guid": "com.kydldev.RidingCrop",
-      "minVersion": "2.0.0"
+      "minVersion": "2.0.1"
     },
     {
       "guid": "com.kydldev.KydlCore",
-      "minVersion": "1.0.0"
+      "minVersion": "1.1.1"
     }
   ],
   "configOverrides": [
     {
       "guid": "com.kydldev.RidingCrop",
       "section": "General",
-      "key": "EnableAll",
+      "key": "Enable mod",
       "value": "true"
     },
     {
       "guid": "com.kydldev.RidingCrop",
-      "section": "Crops",
-      "key": "Enable",
+      "section": "General",
+      "key": "Enable Crops",
       "value": "true"
     },
     {
       "guid": "com.kydldev.RidingCrop",
-      "section": "Sound",
-      "key": "Enable",
+      "section": "General",
+      "key": "Enable Sound",
       "value": "true"
     },
     {

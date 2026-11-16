@@ -14,7 +14,7 @@ namespace RidingCrop;
 /// </summary>
 [BepInPlugin(ModGuid, ModName, ModVersion)]
 [BepInDependency(Jotunn.Main.ModGuid)]
-[BepInDependency(KydlCore.Bootstrap.Plugin.ModGuid, "1.0.0")]     // the KY hub (manifest: KydlDev-KydlCore-1.0.0, same version)
+[BepInDependency(KydlCore.Bootstrap.Plugin.ModGuid, "1.1.1")]     // the KY hub (manifest: KydlDev-KydlCore-1.1.1, same version)
 // New items = everyone on a server needs the mod with the exact same version, otherwise they can't see or hold them.
 [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Patch)]
 public class Plugin : BaseUnityPlugin
@@ -23,7 +23,7 @@ public class Plugin : BaseUnityPlugin
     // ModVersion = manifest.json version_number = newest CHANGELOG heading (tests check it).
     public const string ModGuid = "com.kydldev.RidingCrop";
     public const string ModName = "RidingCrop";
-    public const string ModVersion = "2.0.0";
+    public const string ModVersion = "2.0.1";
 
     private Harmony _harmony;
     private ConfigReloader _cfgWatcher;

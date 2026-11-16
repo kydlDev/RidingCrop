@@ -4,7 +4,7 @@ using KydlCore.Core;
 namespace RidingCrop;
 
 /// <summary>
-/// The crops' own swing and hit sounds. Gate: EnableAll and [Sound] Enable. The sounds are put on the items while they are created at
+/// The crops' own swing and hit sounds. Gate: EnableMod and [Sound] Enable. The sounds are put on the items while they are created at
 /// startup, so a switch changed later only changes <see cref="Running"/> (the README says: restart).
 /// </summary>
 internal sealed class SoundsFeature : IFeature
