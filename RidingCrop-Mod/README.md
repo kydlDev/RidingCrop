@@ -153,3 +153,11 @@ raiseskill ridingcrop 50
 Set `[DebugLog] Enable` to `true` (it can be changed while the game runs) and check the BepInEx log
 (`BepInEx/LogOutput.log`). It then lists the asset bundle contents, each crop's stats, recipe and station, the sound setup, and
 every whoosh, slap and bleed event.
+
+---
+
+![KydlDev](https://raw.githubusercontent.com/kydlDev/.github/main/branding/KydlDev-banner-960x240.png)
+
+## Get help and stay in touch
+Questions, bug reports, ideas or mod requests? Come say hi in the **KydlDev Discord**: **https://discord.gg/tX2CcTNC4W**
+Everyone is welcome, and it is the quickest way to reach me. Source code and issues: https://github.com/kydlDev
