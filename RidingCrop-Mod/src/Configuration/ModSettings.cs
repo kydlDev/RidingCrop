@@ -24,7 +24,7 @@ internal static class ModSettings
     // [DebugLog]
     public static ConfigEntry<bool> DebugLog;
 
-    /// <summary>Is the mod switched on ([General] Enable mod)?</summary>
+    /// <summary>Is the mod switched on ([General] Enable Mod)?</summary>
     public static bool On { get { return EnableMod == null || EnableMod.Value; } }
 
     /// <summary>Are the crops (items and skill) on? EnableMod and [Crops] Enable.</summary>
@@ -60,9 +60,9 @@ internal static class ModSettings
     /// <param name="config">The plugin's config file.</param>
     internal static void Bind(ConfigFile config)
     {
-        EnableMod = config.Bind("General", "Enable mod", Old(config, "General", "EnableAll"),
-            "Switches the whole mod on or off. Needs a game restart: the items and the skill are added when the game starts. " +
-            "While it is off the Riding Crop items are unknown to the game, so keep it on for any world or character that uses them, and use the same value as the server.");
+        EnableMod = config.Bind("General", "Enable Mod", Old(config, "General", "Enable mod", "General", "EnableAll"),
+            ConfigOrder.First("Switches the whole mod on or off. Needs a game restart: the items and the skill are added when the game starts. " +
+            "While it is off the Riding Crop items are unknown to the game, so keep it on for any world or character that uses them, and use the same value as the server."));
 
         CropsEnable = config.Bind("General", "Enable Crops", Old(config, "Crops", "Enable"),
             "Adds the seven Riding Crops and their RidingCrop skill. Needs a game restart. Use the same value as the server.");

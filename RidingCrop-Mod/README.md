@@ -13,7 +13,7 @@ Author: **kydldev**
 
 ## Features
 
-The mod has two functionalities. Each has its own switch, and `[General] Enable mod` switches both.
+The mod has two functionalities. Each has its own switch, and `[General] Enable Mod` switches both.
 
 - **Crops**: the seven riding crops and the RidingCrop skill.
 - **Sound**: the crops' own swing (whoosh) and hit (slap) sounds.
@@ -33,7 +33,7 @@ Riding Crop page in the KY hub (F6).
 
 | Section | Setting | Default | Description |
 |---------|---------|---------|-------------|
-| General | `Enable mod` | `true` | Switches the whole mod on or off. Needs a game restart. While it is off, Riding Crop items are unknown to the game, so keep it on for any world or character that uses them, and use the same value as the server. |
+| General | `Enable Mod` | `true` | Switches the whole mod on or off. Needs a game restart. While it is off, Riding Crop items are unknown to the game, so keep it on for any world or character that uses them, and use the same value as the server. |
 | Crops | `Enable` | `true` | Adds the seven crops and their RidingCrop skill. Needs a restart. Use the same value as the server. |
 | Sound | `Enable` | `true` | The crops use their own swing and hit sounds. Off keeps the Club's sounds. Needs a restart. |
 | Sound | `WhooshVolume` | `1` | Volume of the swing sound (0 to 1). Needs a restart. |
@@ -46,14 +46,14 @@ All item stats are set by the mod and are not configurable, so everyone on a ser
 
 ### Coming from 1.0.0
 
-The 1.0.0 keys were renamed. On the first start of 2.0.0 the old values are carried over: `[General] Enabled` becomes `[General] Enable mod`
+The 1.0.0 keys were renamed. On the first start of 2.0.0 the old values are carried over: `[General] Enabled` becomes `[General] Enable Mod`
 and `[General] DebugLogging` becomes `[DebugLog] Enable`. The Sound settings kept their names.
 
 ## Multiplayer
 
 The crops are items that exist in the world data, so every player and the server must run the same version of the mod. The mod uses
 the network check `EveryoneMustHaveMod` with an exact version match (major.minor.patch): a client with another version is refused.
-Keep `[General] Enable mod` and `[Crops] Enable` the same on the server and all clients. The sound settings only affect your own game.
+Keep `[General] Enable Mod` and `[Crops] Enable` the same on the server and all clients. The sound settings only affect your own game.
 ## Crops and recipes (weakest to strongest)
 
 | # | Item | Item id | Ingredients |
