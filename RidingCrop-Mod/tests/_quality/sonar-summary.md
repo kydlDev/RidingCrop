@@ -1,6 +1,6 @@
 ﻿# SonarQube RidingCrop - OK (Medium/High impact issues: 0; Sonar server gate: ERROR)
 
-Run 2026-11-16 14:31:37, http://localhost:9000/dashboard?id=RidingCrop
+Run 2026-11-17 10:04:36, http://localhost:9000/dashboard?id=RidingCrop
 
 | Measure | Value |
 |---|---|
@@ -10,7 +10,7 @@ Run 2026-11-16 14:31:37, http://localhost:9000/dashboard?id=RidingCrop
 | coverage | 100.0 |
 | duplicated_lines_density | 0.6 |
 | line_coverage | 100.0 |
-| ncloc | 1569 |
+| ncloc | 1587 |
 | reliability_rating | 1.0 |
 | security_hotspots | 0 |
 | security_rating | 1.0 |
