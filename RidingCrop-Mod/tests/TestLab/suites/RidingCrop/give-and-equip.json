@@ -44,12 +44,17 @@
       "seconds": 2
     },
     {
-      "do": "hook",
+      "do": "check",
       "name": "ridingcrop.skillLevel",
       "args": {
         "prefab": "RidingCrop"
       },
-      "min": 0
+      "min": 0,
+      "check": "hook"
+    },
+    {
+      "do": "console",
+      "command": "killall"
     }
   ],
   "asserts": [

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.2
+
+- Changed: needs KydlCore 1.2.0 or newer; Jotunn is no longer needed (the crops, the skill, the bleed effect, the icons and the network check now come from KydlCore).
+- Changed: much more detailed debug log (`[DebugLog] Enable`): every step says what it did and with which values, every early stop says why, and frequent lines are throttled so the log stays readable.
+- Docs: the FAQ has 13 questions (crafting, stations, upgrades, strength, skill, sounds, settings, troubleshooting); the README no longer lists Jotunn as a requirement.
+
 ## 2.0.1
 
 - Changed: needs KydlCore 1.1.1 or newer (the KY hub shows every settings category of the mod as its own tab).

@@ -2,6 +2,7 @@ using BepInEx.Configuration;
 using KydlCore.Common;
 using KydlCore.Core;
 using RidingCrop.Presentation.Hub.Registration;
+using RidingCrop.Core;
 
 namespace RidingCrop.Bootstrap;
 
@@ -35,7 +36,7 @@ internal sealed class ModInstaller
             }
         }
 
-        return page && added && Refresh();
+        { var returnedAt39 = page && added && Refresh(); if (RuleLog.IsOn()) ModLog.Verbose($"ModInstaller.Install: returns {returnedAt39} (line 39)"); return returnedAt39; }
     }
 
     internal bool Refresh()
@@ -50,7 +51,7 @@ internal sealed class ModInstaller
             ModLog.Verbose("ModInstaller: refresh - " + r);
         }
 
-        return r.IsSuccess;
+        { var returnedAt54 = r.IsSuccess; if (RuleLog.IsOn()) ModLog.Verbose($"ModInstaller.Refresh: returns {returnedAt54} (line 54)"); return returnedAt54; }
     }
 
     internal bool Uninstall()
@@ -62,6 +63,6 @@ internal sealed class ModInstaller
             Current = null;
         }
 
-        return r.IsSuccess && gone;
+        { var returnedAt67 = r.IsSuccess && gone; if (RuleLog.IsOn()) ModLog.Verbose($"ModInstaller.Uninstall: returns {returnedAt67} (line 67)"); return returnedAt67; }
     }
 }

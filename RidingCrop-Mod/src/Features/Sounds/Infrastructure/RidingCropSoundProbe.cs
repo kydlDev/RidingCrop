@@ -1,6 +1,7 @@
 using System.Collections;
 using KydlCore.Common;
 using UnityEngine;
+using RidingCrop.Core;
 
 namespace RidingCrop;
 
@@ -18,7 +19,7 @@ public class RidingCropSoundProbe : MonoBehaviour
     {
         if (!ModSettings.DebugOn)
         {
-            return;
+            { if (RuleLog.IsOn()) ModLog.Verbose("RidingCropSoundProbe.OnEnable: returns because the debug log is off (DebugOn=" + ModSettings.DebugOn + ", label=" + Label + ") (line 22)"); return; }
         }
 
         ModLog.Verbose("[sound] frame " + Time.frameCount + ": '" + Label + "' spawned at " + transform.position + ".");

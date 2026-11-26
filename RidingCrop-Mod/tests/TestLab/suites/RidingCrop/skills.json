@@ -80,6 +80,10 @@
       },
       "notContains": "None",
       "label": "skill registered"
+    },
+    {
+      "do": "console",
+      "command": "killall"
     }
   ],
   "asserts": [

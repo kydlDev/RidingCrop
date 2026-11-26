@@ -1,5 +1,7 @@
 using KydlCore.Common;
+using KydlCore.Features.Diagnostics.Contracts;
 using UnityEngine;
+using RidingCrop.Core;
 
 namespace RidingCrop;
 
@@ -31,12 +33,14 @@ public class SE_RidingCropBleed : StatusEffect
     // Without this the bleed ticks have no attacker, so a kill by bleeding gave the player no credit (kill/XP/aggro).
     public override void SetAttacker(Character attacker)
     {
+        if (RuleLog.IsOn()) ModLog.Verbose($"SE_RidingCropBleed.SetAttacker(attacker={attacker})");
         base.SetAttacker(attacker);
         _attacker = attacker;
     }
 
     public void Configure(float damagePerSecond, float durationSeconds)
     {
+        if (RuleLog.IsOn()) ModLog.Verbose($"SE_RidingCropBleed.Configure(damagePerSecond={damagePerSecond}, durationSeconds={durationSeconds})");
         m_tickInterval = 1f;
         m_damagePerTick = damagePerSecond * m_tickInterval;
         m_ticksTotal = Mathf.Max(1, Mathf.RoundToInt(durationSeconds / m_tickInterval));
@@ -50,6 +54,8 @@ public class SE_RidingCropBleed : StatusEffect
         _tickTimer = m_tickInterval;
         _ticksDone = 0;
         ModLog.Verbose("[bleed] '" + name + "' started on '" + (character != null ? character.name : "null") + "': " + m_damagePerTick.ToString("0.#") + " x " + m_ticksTotal);
+        // The flight recorder keeps the last two minutes of this creature, with the bleed state next to its position and health (PROJECT_RULES 28).
+        if (character != null) FlightRecorder.Track(character, "RidingCropBleed", () => $"bleed {name}: {_ticksDone}/{m_ticksTotal} ticks of {m_damagePerTick:0.#} damage, next tick in {_tickTimer:0.0} s, attacker={(_attacker != null ? _attacker.name : "<none>")}");
     }
 
     // The game calls this when a target that already has THIS crop's bleed is hit again. A bleed that is still running is
@@ -74,7 +80,7 @@ public class SE_RidingCropBleed : StatusEffect
     {
         if (character == null)
         {
-            return base.CanAdd(character);
+            { var returnedAt80 = base.CanAdd(character); if (RuleLog.IsOn()) ModLog.Verbose($"SE_RidingCropBleed.CanAdd: returns {returnedAt80} (line 80)"); return returnedAt80; }
         }
 
         SEMan seMan = character.GetSEMan();
@@ -92,7 +98,7 @@ public class SE_RidingCropBleed : StatusEffect
             }
         }
 
-        return base.CanAdd(character);
+        { var returnedAt98 = base.CanAdd(character); if (RuleLog.IsOn()) ModLog.Verbose($"SE_RidingCropBleed.CanAdd: returns {returnedAt98} (line 98)"); return returnedAt98; }
     }
 
     public override void UpdateStatusEffect(float dt)
@@ -100,13 +106,13 @@ public class SE_RidingCropBleed : StatusEffect
         base.UpdateStatusEffect(dt);
         if (m_character == null || _ticksDone >= m_ticksTotal)
         {
-            return;
+            { if (RuleLog.IsOn()) ModLog.Verbose($"SE_RidingCropBleed.UpdateStatusEffect: returns (line 106) - inputs (dt={dt})"); return; }
         }
 
         _tickTimer -= dt;
         if (_tickTimer > 0f)
         {
-            return;
+            { if (RuleLog.IsOn()) ModLog.Verbose($"SE_RidingCropBleed.UpdateStatusEffect: returns (line 112) - inputs (dt={dt})"); return; }
         }
 
         _tickTimer += m_tickInterval;

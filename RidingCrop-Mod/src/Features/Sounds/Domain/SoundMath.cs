@@ -1,4 +1,5 @@
 using System;
+using RidingCrop.Core;
 
 namespace RidingCrop;
 
@@ -16,6 +17,7 @@ internal static class SoundMath
     /// <returns>The peak level, 0 for empty data.</returns>
     internal static float Peak(float[] data)
     {
+        if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.Peak(data={data})");
         float peak = 0f;
         for (int i = 0; i < data.Length; i++)
         {
@@ -27,7 +29,7 @@ internal static class SoundMath
             }
         }
 
-        return peak;
+        { var returnedAt32 = peak; if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.Peak: returns {returnedAt32} (line 32)"); return returnedAt32; }
     }
 
     /// <summary>The first frame whose level reaches <paramref name="fraction"/> of the peak: where the impact begins.</summary>
@@ -38,28 +40,31 @@ internal static class SoundMath
     /// <returns>The frame index, 0 when nothing reaches the level.</returns>
     internal static int OnsetFrame(float[] data, int channels, float peak, float fraction)
     {
+        if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.OnsetFrame(data={data}, channels={channels}, peak={peak}, fraction={fraction})");
         float level = fraction * peak;
         for (int i = 0; i < data.Length; i++)
         {
             if (Math.Abs(data[i]) >= level)
             {
-                return i / channels;
+                { var returnedAt49 = i / channels; if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.OnsetFrame: returns {returnedAt49} (line 49)"); return returnedAt49; }
             }
         }
 
-        return 0;
+        { if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.OnsetFrame: returns 0 (line 53) - inputs (data={data}, channels={channels}, peak={peak}, fraction={fraction})"); return 0; }
     }
 
     /// <summary>The frame to start playback at: 5 ms before the impact.</summary>
     internal static int StartFrame(int onsetFrame, int frequency)
     {
-        return Math.Max(0, onsetFrame - frequency / 200);
+        if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.StartFrame(onsetFrame={onsetFrame}, frequency={frequency})");
+        { var returnedAt60 = Math.Max(0, onsetFrame - frequency / 200); if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.StartFrame: returns {returnedAt60} (line 60)"); return returnedAt60; }
     }
 
     /// <summary>Gain that makes the clip as loud as its data allows (never below 1).</summary>
     internal static float NormalizeGain(float peak)
     {
-        return Math.Max(1f, 0.98f / peak);
+        if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.NormalizeGain(peak={peak})");
+        { var returnedAt67 = Math.Max(1f, 0.98f / peak); if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.NormalizeGain: returns {returnedAt67} (line 67)"); return returnedAt67; }
     }
 
     /// <summary>Copies the data from <paramref name="startFrame"/>, multiplied by the gain, with a 3 ms fade-in so the cut cannot click.</summary>
@@ -71,6 +76,7 @@ internal static class SoundMath
     /// <returns>The new interleaved samples, clamped to -1..1.</returns>
     internal static float[] TrimAndNormalize(float[] data, int channels, int frequency, int startFrame, float gain)
     {
+        if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.TrimAndNormalize(data={data}, channels={channels}, frequency={frequency}, startFrame={startFrame}, gain={gain})");
         int frames = data.Length / channels;
         int fadeFrames = Math.Max(1, frequency * 3 / 1000);
         int outFrames = frames - startFrame;
@@ -86,7 +92,7 @@ internal static class SoundMath
             }
         }
 
-        return output;
+        { var returnedAt95 = output; if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.TrimAndNormalize: returns {returnedAt95} (line 95)"); return returnedAt95; }
     }
 
     /// <summary>Soft limiter: levels above the knee are bent towards 1 with a tanh curve.</summary>
@@ -94,14 +100,15 @@ internal static class SoundMath
     /// <returns>The limited level.</returns>
     internal static float SoftLimit(float amplified)
     {
+        if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.SoftLimit(amplified={amplified})");
         // Stryker disable once Equality : at the knee the curve starts with tanh(0) = 0, so both branches return the knee
         if (amplified <= LimiterKnee)
         {
-            return amplified;
+            { var returnedAt107 = amplified; if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.SoftLimit: returns {returnedAt107} (line 107)"); return returnedAt107; }
         }
 
         float headroom = 1f - LimiterKnee;
-        return LimiterKnee + headroom * (float)Math.Tanh((amplified - LimiterKnee) / headroom);
+        { var returnedAt111 = LimiterKnee + headroom * (float)Math.Tanh((amplified - LimiterKnee) / headroom); if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.SoftLimit: returns {returnedAt111} (line 111)"); return returnedAt111; }
     }
 
     /// <summary>Multiplies every sample by <paramref name="gain"/> and soft-limits the loud ones, in place.</summary>
@@ -112,6 +119,7 @@ internal static class SoundMath
     /// <param name="limited">How many samples the limiter touched.</param>
     internal static void ApplyGain(float[] data, float gain, out float peakBefore, out float peakAfter, out int limited)
     {
+        if (RuleLog.IsOn()) RuleLog.Verbose($"SoundMath.ApplyGain(data={data}, gain={gain})");
         peakBefore = 0f;
         peakAfter = 0f;
         limited = 0;

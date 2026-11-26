@@ -5,6 +5,7 @@ using HarmonyLib;
 using KydlCore.Common;
 using RidingCrop.Configuration;
 using RidingCrop.Bootstrap;
+using RidingCrop.Core;
 
 namespace RidingCrop;
 
@@ -56,6 +57,7 @@ public class Plugin : BaseUnityPlugin
 
     private void Update()
     {
+        if (RuleLog.IsOn()) ModLog.Every("Plugin.Update", 2d, $"Plugin.Update: tick - cfgWatcher={(_cfgWatcher != null)}, installer={(_installer != null)}, inStartup={InStartup}");
         if (_cfgWatcher != null) _cfgWatcher.Tick();
     }
 
@@ -64,6 +66,6 @@ public class Plugin : BaseUnityPlugin
         if (_cfgWatcher != null) { _cfgWatcher.Dispose(); _cfgWatcher = null; }
         if (_installer != null) { _installer.Uninstall(); _installer = null; }
         if (_harmony != null) _harmony.UnpatchSelf();
-        ModLog.Verbose("Plugin: destroyed (patches removed)");
+        ModLog.Verbose($"Plugin: destroyed (patches removed) - harmony={(_harmony != null)}, installer={(_installer != null)}, cfgWatcher={(_cfgWatcher != null)}");
     }
 }

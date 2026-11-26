@@ -1,5 +1,6 @@
 using BepInEx.Configuration;
 using KydlCore.Common;
+using RidingCrop.Core;
 
 namespace RidingCrop.Presentation.Hub.Registration;
 
@@ -19,6 +20,6 @@ internal static class HubTabs
     internal static bool UnregisterModPage()
     {
         global::KydlCore.Features.Hub.Contracts.KyHub.RemoveTab(Plugin.ModGuid, SettingsId);
-        return !global::KydlCore.Features.Hub.Contracts.KyHub.HasTab(Plugin.ModGuid, SettingsId);
+        { var returnedAt24 = !global::KydlCore.Features.Hub.Contracts.KyHub.HasTab(Plugin.ModGuid, SettingsId); if (RuleLog.IsOn()) ModLog.Verbose($"HubTabs.UnregisterModPage: returns {returnedAt24} (line 24)"); return returnedAt24; }
     }
 }

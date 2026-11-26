@@ -72,6 +72,10 @@
         "prefab": "RidingCrop_V5"
       },
       "contains": "MooseHide:10"
+    },
+    {
+      "do": "console",
+      "command": "killall"
     }
   ],
   "asserts": [

@@ -26,6 +26,10 @@
       "count": 1,
       "free": false,
       "station": "piece_workbench"
+    },
+    {
+      "do": "console",
+      "command": "killall"
     }
   ],
   "asserts": [

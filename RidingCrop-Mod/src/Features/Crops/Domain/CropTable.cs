@@ -1,4 +1,5 @@
 using System;
+using RidingCrop.Core;
 
 namespace RidingCrop;
 
@@ -15,6 +16,7 @@ internal sealed class CropIngredient
 {
     internal CropIngredient(string item, int amount)
     {
+        if (RuleLog.IsOn()) RuleLog.Verbose($"CropIngredient.CropIngredient(item={item}, amount={amount})");
         Item = item;
         Amount = amount;
     }
@@ -34,6 +36,7 @@ internal sealed class CropDef
 {
     internal CropDef(string prefabName, string displayName, string description, string albedoName, CropStation station, int stationLevel, params CropIngredient[] ingredients)
     {
+        if (RuleLog.IsOn()) RuleLog.Verbose($"CropDef.CropDef(prefabName={prefabName}, displayName={displayName}, description={description}, albedoName={albedoName}, station={station}, stationLevel={stationLevel})");
         PrefabName = prefabName;
         DisplayName = displayName;
         Description = description;

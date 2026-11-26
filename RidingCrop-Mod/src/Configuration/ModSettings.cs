@@ -1,5 +1,6 @@
 using KydlCore.Common;
 using BepInEx.Configuration;
+using RidingCrop.Core;
 
 namespace RidingCrop;
 
@@ -41,6 +42,7 @@ internal static class ModSettings
     /// given (section, key, section, key, ...) pairs that holds a bool; true when there is none.
     private static bool Old(ConfigFile c, params string[] sectionAndKey)
     {
+        if (RuleLog.IsOn()) ModLog.Verbose($"ModSettings.Old(c={c})");
         // OrphanedEntries is not a public member of every BepInEx 5 build (ConfigTools.DropRemoved reaches it the same way)
         System.Reflection.PropertyInfo orphans = typeof(ConfigFile).GetProperty("OrphanedEntries", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
         var dict = orphans != null ? orphans.GetValue(c, null) as System.Collections.IDictionary : null;
@@ -50,17 +52,18 @@ internal static class ModSettings
             bool b;
             if (dict.Contains(def) && bool.TryParse((dict[def] as string ?? "").Trim(), out b))
             {
-                return b;
+                { var returnedAt55 = b; if (RuleLog.IsOn()) ModLog.Verbose($"ModSettings.Old: returns {returnedAt55} (line 55)"); return returnedAt55; }
             }
         }
 
-        return true;
+        { if (RuleLog.IsOn()) ModLog.Verbose($"ModSettings.Old: returns true (line 59) - inputs (c={c})"); return true; }
     }
 
     /// <summary>Binds every entry. Called once, first thing after the log is ready.</summary>
     /// <param name="config">The plugin's config file.</param>
     internal static void Bind(ConfigFile config)
     {
+        if (RuleLog.IsOn()) ModLog.Verbose($"ModSettings.Bind(config={config})");
         EnableMod = config.Bind("General", "Enable Mod", Old(config, "General", "Enable mod", "General", "EnableAll"),
             ConfigOrder.First("Switches the whole mod on or off. Needs a game restart: the items and the skill are added when the game starts. " +
             "While it is off the Riding Crop items are unknown to the game, so keep it on for any world or character that uses them, and use the same value as the server."));

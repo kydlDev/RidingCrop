@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using KydlCore.Common;
 using UnityEngine;
+using RidingCrop.Core;
 
 namespace RidingCrop;
 
@@ -41,7 +42,7 @@ internal static class CropAssets
         AssetBundle bundle = OpenBundle();
         if (bundle == null)
         {
-            return false;
+            { if (RuleLog.IsOn()) ModLog.Verbose("CropAssets.Load: returns false because the asset bundle could not be opened (bundle=" + (bundle != null) + ") (line 45)"); return false; }
         }
 
         try
@@ -87,10 +88,10 @@ internal static class CropAssets
         ModLog.Verbose("CropAssets: bundle sounds -> whoosh: " + (WhooshClip != null ? WhooshClip.name : "MISSING") + ", slap: " + (SlapClip != null ? SlapClip.name : "MISSING"));
         if (WhooshClip == null || SlapClip == null)
         {
-            ModLog.Warn("CropAssets: a sound clip is missing from the bundle (rebuild it in Unity: Valheim > Build Riding Crop Bundle). The crops will work, but without their own sound for the missing clip.");
+            ModLog.Warn($"CropAssets: a sound clip is missing from the bundle (rebuild it in Unity: Valheim > Build Riding Crop Bundle). The crops will work, but without their own sound for the missing clip - whoosh={(WhooshClip != null)}, slap={(SlapClip != null)}");
         }
 
-        return Loaded;
+        { var returnedAt94 = Loaded; if (RuleLog.IsOn()) ModLog.Verbose($"CropAssets.Load: returns {returnedAt94} (line 94)"); return returnedAt94; }
     }
 
     // 1) embedded in the DLL (Kydl.Mod.targets embeds Assets\<bundle>; read fully into memory), 2) the file next to the DLL.
@@ -136,6 +137,6 @@ internal static class CropAssets
             ModLog.Verbose("CropAssets: bundle loaded from " + path);
         }
 
-        return fromFile;
+        { var returnedAt140 = fromFile; if (RuleLog.IsOn()) ModLog.Verbose($"CropAssets.OpenBundle: returns {returnedAt140} (line 140)"); return returnedAt140; }
     }
 }

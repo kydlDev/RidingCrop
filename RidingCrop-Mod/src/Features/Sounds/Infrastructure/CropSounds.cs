@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Jotunn.Managers;
 using KydlCore.Common;
 using UnityEngine;
+using RidingCrop.Core;
 
 namespace RidingCrop;
 
@@ -32,8 +32,8 @@ internal static class CropSounds
     {
         if (!ModSettings.SoundsOn)
         {
-            ModLog.Verbose("CropSounds: sounds are off, the crop keeps the Club's sounds.");
-            return;
+            ModLog.Verbose($"CropSounds: sounds are off, the crop keeps the Club's sounds - soundsOn={ModSettings.SoundsOn}");
+            { if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.Apply: returns because the sounds are off (soundsOn={ModSettings.SoundsOn}) (line 36)"); return; }
         }
 
         Prepare(shared);
@@ -77,13 +77,13 @@ internal static class CropSounds
     {
         if (_ready)
         {
-            return;
+            { if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.Prepare: returns (line 80) - inputs (shared={shared})"); return; }
         }
 
         _ready = true;
         if (CropAssets.WhooshClip == null && CropAssets.SlapClip == null)
         {
-            return;
+            { if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.Prepare: returns (line 86) - inputs (shared={shared})"); return; }
         }
 
         LogEffects("m_startEffect", shared.m_startEffect);
@@ -94,8 +94,8 @@ internal static class CropSounds
         GameObject template = FindTemplate(shared);
         if (template == null)
         {
-            ModLog.Warn("CropSounds: no vanilla sound prefab found to copy; the crops keep the Club's sounds.");
-            return;
+            ModLog.Warn($"CropSounds: no vanilla sound prefab found to copy; the crops keep the Club's sounds - whooshClip={(CropAssets.WhooshClip != null)}, slapClip={(CropAssets.SlapClip != null)}");
+            { if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.Prepare: returns because no vanilla sound prefab was found (template={template != null}) (line 98)"); return; }
         }
 
         ModLog.Verbose("CropSounds: using vanilla sound prefab '" + template.name + "' as the template.");
@@ -145,7 +145,7 @@ internal static class CropSounds
             prepared.hideFlags = HideFlags.DontUnloadUnusedAsset;
             ModLog.Verbose("CropSounds: slap clip '" + source.name + "': peak " + peak.ToString("0.000") + ", amplified x" + gain.ToString("0.00")
                 + ", removed " + (start * 1000f / source.frequency).ToString("0") + " ms of lead-in.");
-            return prepared;
+            { var returnedAt148 = prepared; if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.PrepareClip: returns {returnedAt148} (line 148)"); return returnedAt148; }
         }
         catch (Exception ex)
         {
@@ -159,7 +159,7 @@ internal static class CropSounds
     {
         if (source == null || Mathf.Abs(gain - 1f) < 0.001f)
         {
-            return source;
+            { var returnedAt162 = source; if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.ApplyGain: returns {returnedAt162} (line 162)"); return returnedAt162; }
         }
 
         try
@@ -184,7 +184,7 @@ internal static class CropSounds
             boosted.hideFlags = HideFlags.DontUnloadUnusedAsset;
             ModLog.Verbose("CropSounds: " + label + ": gain x" + gain.ToString("0.##") + " applied, peak " + peakBefore.ToString("0.000") + " -> " + peakAfter.ToString("0.000")
                 + (limited > 0 ? ", soft limiter touched " + limited + " samples." : ", no limiting needed."));
-            return boosted;
+            { var returnedAt187 = boosted; if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.ApplyGain: returns {returnedAt187} (line 187)"); return returnedAt187; }
         }
         catch (Exception ex)
         {
@@ -196,7 +196,7 @@ internal static class CropSounds
     // critical = the sound must never be dropped (the slap): no concurrency limit and top voice priority.
     private static GameObject CreatePrefab(string prefabName, GameObject template, AudioClip clip, float volume, float gain, bool critical)
     {
-        GameObject prefab = PrefabManager.Instance.CreateClonedPrefab(prefabName, template);
+        GameObject prefab = KyPrefabs.Clone(prefabName, template);
         if (prefab == null)
         {
             ModLog.Warn("CropSounds: could not create sound prefab '" + prefabName + "'.");
@@ -256,7 +256,7 @@ internal static class CropSounds
         probe.Label = prefabName;
 
         // Registers it with the game's prefab table so it also works for other players (multiplayer).
-        PrefabManager.Instance.AddPrefab(prefab);
+        KyPrefabs.Add(prefab);
         ModLog.Verbose("CropSounds: sound prefab '" + prefabName + "' created (" + sfxComponents.Length + " ZSFX, clip '" + clip.name + "', " + clip.length.ToString("0.00") + "s).");
         return prefab;
     }
@@ -264,6 +264,7 @@ internal static class CropSounds
     // 1) a sound-only prefab already used by this weapon ("sfx_..." naming), 2) well-known names, 3) any prefab with sound.
     private static GameObject FindTemplate(ItemDrop.ItemData.SharedData shared)
     {
+        if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.FindTemplate(shared={shared})");
         var candidates = new List<GameObject>();
         foreach (EffectList list in new[] { shared.m_triggerEffect, shared.m_startEffect, shared.m_hitEffect, shared.m_hitTerrainEffect })
         {
@@ -284,56 +285,60 @@ internal static class CropSounds
         GameObject best = candidates.FirstOrDefault(c => c.name.StartsWith("sfx_", StringComparison.OrdinalIgnoreCase));
         if (best != null)
         {
-            return best;
+            { var returnedAt288 = best; if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.FindTemplate: returns {returnedAt288} (line 288)"); return returnedAt288; }
         }
 
         foreach (string name in new[] { "sfx_club_hit", "sfx_sword_hit", "sfx_sword_swing", "sfx_club_swing" })
         {
-            GameObject prefab = PrefabManager.Instance.GetPrefab(name);
+            GameObject prefab = KyPrefabs.Get(name);
             if (prefab != null && IsSound(prefab))
             {
-                return prefab;
+                { var returnedAt296 = prefab; if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.FindTemplate: returns {returnedAt296} (line 296)"); return returnedAt296; }
             }
         }
 
-        return candidates.FirstOrDefault();
+        { var returnedAt300 = candidates.FirstOrDefault(); if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.FindTemplate: returns {returnedAt300} (line 300)"); return returnedAt300; }
     }
 
     // Only "sound-only" prefabs count (ZSFX on the root object). Combined effects that also carry particles are left alone.
     private static bool IsSound(GameObject prefab)
     {
-        return prefab != null && prefab.GetComponent<ZSFX>() != null;
+        if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.IsSound(prefab={prefab})");
+        { var returnedAt307 = prefab != null && prefab.GetComponent<ZSFX>() != null; if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.IsSound: returns {returnedAt307} (line 307)"); return returnedAt307; }
     }
 
     private static bool HasSound(EffectList list)
     {
+        if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.HasSound(list={list})");
         return list != null && list.m_effectPrefabs != null && list.m_effectPrefabs.Any(e => e != null && e.m_prefab != null && IsSound(e.m_prefab));
     }
 
     // A copy of the list without its sound-only effects (visual effects like particles stay).
     private static EffectList WithoutSounds(EffectList list)
     {
+        if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.WithoutSounds(list={list})");
         List<EffectList.EffectData> kept = list == null || list.m_effectPrefabs == null
             ? new List<EffectList.EffectData>()
             : list.m_effectPrefabs.Where(e => e != null && !(e.m_prefab != null && IsSound(e.m_prefab))).ToList();
-        return new EffectList { m_effectPrefabs = kept.ToArray() };
+        { var returnedAt323 = new EffectList { m_effectPrefabs = kept.ToArray() }; if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.WithoutSounds: returns {returnedAt323} (line 323)"); return returnedAt323; }
     }
 
     // A copy of the list with our effect added.
     private static EffectList With(EffectList list, GameObject prefab)
     {
+        if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.With(list={list}, prefab={prefab})");
         List<EffectList.EffectData> entries = list == null || list.m_effectPrefabs == null
             ? new List<EffectList.EffectData>()
             : list.m_effectPrefabs.Where(e => e != null).ToList();
         entries.Add(new EffectList.EffectData { m_prefab = prefab, m_enabled = true, m_variant = -1 });
-        return new EffectList { m_effectPrefabs = entries.ToArray() };
+        { var returnedAt334 = new EffectList { m_effectPrefabs = entries.ToArray() }; if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.With: returns {returnedAt334} (line 334)"); return returnedAt334; }
     }
 
     private static void LogEffects(string label, EffectList list)
     {
         if (!ModSettings.DebugOn)
         {
-            return;
+            { if (RuleLog.IsOn()) ModLog.Verbose($"CropSounds.LogEffects: returns (line 341) - inputs (label={label}, list={list})"); return; }
         }
 
         string names = list == null || list.m_effectPrefabs == null

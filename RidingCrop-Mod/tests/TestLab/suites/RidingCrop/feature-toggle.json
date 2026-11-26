@@ -203,6 +203,10 @@
         "expect": true
       },
       "timeout": 5
+    },
+    {
+      "do": "console",
+      "command": "killall"
     }
   ],
   "asserts": [

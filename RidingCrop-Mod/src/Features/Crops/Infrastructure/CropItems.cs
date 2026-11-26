@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Jotunn;
-using Jotunn.Configs;
-using Jotunn.Entities;
-using Jotunn.Managers;
 using KydlCore.Common;
+using KydlCore.Features.Items.Contracts;
 using UnityEngine;
+using RidingCrop.Core;
 
 namespace RidingCrop;
 
@@ -32,12 +30,20 @@ internal static class CropItems
     private static readonly List<Transform> Visuals = new List<Transform>();
 
     /// <summary>The registered items (for the test hooks).</summary>
-    internal static List<CustomItem> Items { get; } = new List<CustomItem>();
+    internal static List<GameObject> Items { get; } = new List<GameObject>();
+
+    private static bool _done;
 
     /// <summary>Adds every crop. Runs once, when the vanilla prefabs exist.</summary>
     internal static void AddAll()
     {
-        PrefabManager.OnVanillaPrefabsAvailable -= AddAll;
+        if (_done)
+        {
+            ModLog.Verbose($"CropItems.AddAll: already done, nothing to repeat - items={Items.Count}");
+            { if (RuleLog.IsOn()) ModLog.Verbose($"CropItems.AddAll: returns because the crops were already added (done={_done}, items={Items.Count}) (line 43)"); return; }
+        }
+
+        _done = true;
 
         for (int i = 0; i < CropTable.All.Length; i++)
         {
@@ -66,11 +72,12 @@ internal static class CropItems
 
     private static string StationName(CropStation station)
     {
+        if (RuleLog.IsOn()) ModLog.Verbose($"CropItems.StationName(station={station})");
         switch (station)
         {
-            case CropStation.Forge: return CraftingStations.Forge;
-            case CropStation.BlackForge: return CraftingStations.BlackForge;
-            default: return CraftingStations.Workbench;
+            case CropStation.Forge: { if (RuleLog.IsOn()) ModLog.Verbose($"CropItems.StationName: returns \"forge\" (line 78) - inputs (station={station})"); return "forge"; }
+            case CropStation.BlackForge: { if (RuleLog.IsOn()) ModLog.Verbose($"CropItems.StationName: returns \"blackforge\" (line 79) - inputs (station={station})"); return "blackforge"; }
+            default: { if (RuleLog.IsOn()) ModLog.Verbose($"CropItems.StationName: returns \"piece_workbench\" (line 80) - inputs (station={station})"); return "piece_workbench"; }
         }
     }
 
@@ -83,28 +90,25 @@ internal static class CropItems
             return;
         }
 
-        RequirementConfig[] requirements = tier.Ingredients.Select(i => new RequirementConfig(i.Item, i.Amount, i.UpgradeAmount)).ToArray();
-        var config = new ItemConfig
-        {
-            Name = tier.DisplayName,
-            Description = tier.Description,
-            CraftingStation = StationName(tier.Station),
-            MinStationLevel = tier.StationLevel,
-            Requirements = requirements,
-        };
+        KyResource[] requirements = tier.Ingredients.Select(i => new KyResource(i.Item, i.Amount) { AmountPerLevel = i.UpgradeAmount }).ToArray();
+        var recipe = new KyRecipe { CraftingStation = StationName(tier.Station), MinStationLevel = tier.StationLevel, Amount = 1, Resources = requirements };
 
-        var item = new CustomItem(tier.PrefabName, CropTable.VanillaBasePrefab, config);
-        if (item.ItemPrefab == null)
+        GameObject prefab = KyPrefabs.Clone(tier.PrefabName, CropTable.VanillaBasePrefab);
+        ItemDrop drop = prefab != null ? prefab.GetComponent<ItemDrop>() : null;
+        if (drop == null)
         {
-            ModLog.Error("CropItems: could not clone vanilla prefab '" + CropTable.VanillaBasePrefab + "'. '" + tier.PrefabName + "' not added.");
+            ModLog.Error("CropItems: could not clone vanilla prefab '" + CropTable.VanillaBasePrefab + "' (prefab=" + (prefab != null) + "). '" + tier.PrefabName + "' not added.");
             return;
         }
 
-        ApplyVisuals(item.ItemPrefab, tier);
+        ApplyVisuals(prefab, tier);
         ModLog.Verbose("CropItems: '" + tier.PrefabName + "': station " + tier.Station + " level " + tier.StationLevel + " (quality 1), ingredients: "
             + string.Join(", ", requirements.Select(r => r.Amount + " " + r.Item + " (+" + r.AmountPerLevel + "/upgrade)").ToArray()));
 
-        ItemDrop.ItemData.SharedData shared = item.ItemDrop.m_itemData.m_shared;
+        ItemDrop.ItemData.SharedData shared = drop.m_itemData.m_shared;
+        shared.m_name = tier.DisplayName;
+        shared.m_description = tier.Description;
+        drop.m_itemData.m_dropPrefab = prefab;
 
         // All crops train (and are boosted by) the same "RidingCrop" skill instead of the Club's skill.
         if (CropSkill.Type != Skills.SkillType.None)
@@ -115,28 +119,44 @@ internal static class CropItems
         SE_RidingCropBleed bleed = ApplyBalance(shared, tier, index);
         CropSounds.Apply(shared);
 
-        ItemManager.Instance.AddItem(item);
-        Items.Add(item);
+        RenderIcon(prefab, shared, bleed, tier);
 
-        RenderIcon(item, shared, bleed, tier);
+        KyPrefabs.Add(prefab);
+        KyResult result = KyItems.Contribute(new KyContribution
+        {
+            Id = "ridingcrop:" + tier.PrefabName.ToLowerInvariant(),
+            ModGuid = Plugin.ModGuid,
+            DisplayName = tier.DisplayName,
+            Prefab = prefab,
+            Kind = KyKind.Item,
+            Recipe = recipe,
+            RegisterInGame = true,
+            Tags = new[] { "RidingCrop", "weapon" },
+        });
+        if (!result.Accepted)
+        {
+            ModLog.Error("CropItems: KY-Items refused '" + tier.PrefabName + "': " + result.Reason);
+            return;
+        }
+
+        Items.Add(prefab);
         ModLog.Verbose("CropItems: '" + tier.DisplayName + "' (" + tier.PrefabName + ") registered as tier " + index);
     }
 
     // Inventory icon: a miniature of the crop (just its mesh + this tier's material), standing upright and then tilted to the right.
-    // Jotunn's icon camera looks along -Z with screen-right = world -X, so rolling the model around Z by a POSITIVE angle tips its top
+    // The icon camera (KyIcons, same view as Jotunn's) looks along -Z with screen-right = world -X, so rolling the model around Z by a POSITIVE angle tips its top
     // toward the right of the icon. If this fails the item still works, it just keeps the Club's icon.
-    private static void RenderIcon(CustomItem item, ItemDrop.ItemData.SharedData shared, SE_RidingCropBleed bleed, CropDef tier)
+    private static void RenderIcon(GameObject itemPrefab, ItemDrop.ItemData.SharedData shared, SE_RidingCropBleed bleed, CropDef tier)
     {
         GameObject iconSource = null;
         try
         {
-            iconSource = CreateIconSource(item.ItemPrefab) ?? item.ItemPrefab;
-            Sprite icon = RenderManager.Instance.Render(new RenderManager.RenderRequest(iconSource)
+            iconSource = CreateIconSource(itemPrefab) ?? itemPrefab;
+            Sprite icon = KyIcons.Render(new KyIconRequest(iconSource)
             {
                 Width = 128,
                 Height = 128,
                 Rotation = Quaternion.Euler(0f, 0f, IconTiltDegrees),
-                UseCache = false,
             });
             if (icon != null)
             {
@@ -148,10 +168,7 @@ internal static class CropItems
 
                 // No separate skill icon exists, so the skill uses the first crop's inventory icon that rendered successfully.
                 // The game reads the icon when it creates the player's Skills object, which happens after this point.
-                if (CropSkill.Config != null && CropSkill.Config.Icon == null)
-                {
-                    CropSkill.Config.Icon = icon;
-                }
+                CropSkill.SetIcon(icon);
 
                 ModLog.Verbose("CropItems: '" + tier.PrefabName + "' icon rendered (tilt " + IconTiltDegrees + " degrees)");
             }
@@ -166,7 +183,7 @@ internal static class CropItems
         }
         finally
         {
-            if (iconSource != null && iconSource != item.ItemPrefab)
+            if (iconSource != null && iconSource != itemPrefab)
             {
                 UnityEngine.Object.DestroyImmediate(iconSource);
             }
@@ -177,16 +194,17 @@ internal static class CropItems
     // shows the crop upright (long axis = up) before the tilt is applied. Returns null if the visual is missing.
     private static GameObject CreateIconSource(GameObject itemPrefab)
     {
+        if (RuleLog.IsOn()) ModLog.Verbose($"CropItems.CreateIconSource(itemPrefab={itemPrefab})");
         MeshRenderer visual = itemPrefab.GetComponentsInChildren<MeshRenderer>(true).FirstOrDefault(r => r.gameObject.name == "RidingCropVisual");
         if (visual == null || CropAssets.Mesh == null)
         {
-            return null;
+            { if (RuleLog.IsOn()) ModLog.Verbose($"CropItems.CreateIconSource: returns null (line 201) - inputs (itemPrefab={itemPrefab})"); return null; }
         }
 
         var go = new GameObject("RidingCropIconSource");
         go.AddComponent<MeshFilter>().sharedMesh = CropAssets.Mesh;
         go.AddComponent<MeshRenderer>().sharedMaterial = visual.sharedMaterial;
-        return go;
+        { var returnedAt207 = go; if (RuleLog.IsOn()) ModLog.Verbose($"CropItems.CreateIconSource: returns {returnedAt207} (line 207)"); return returnedAt207; }
     }
 
     // Every crop deals ONLY blunt damage + a bleed (see CropBalance for the ladder). Valheim has no bleed damage type, so the bleed is a
@@ -234,7 +252,7 @@ internal static class CropItems
             + "), stagger " + CropBalance.Stagger(index).ToString("0.#") + ", knockback " + CropBalance.Knockback(index).ToString("0.#")
             + ", stamina " + CropBalance.Stamina(index).ToString("0.#") + ", block armor " + CropBalance.BlockArmor(index).ToString("0.#")
             + ", durability " + maxDurability.ToString("0.#") + " (Club " + clubDurability.ToString("0.#") + ")");
-        return bleed;
+        { var returnedAt255 = bleed; if (RuleLog.IsOn()) ModLog.Verbose($"CropItems.ApplyBalance: returns {returnedAt255} (line 255)"); return returnedAt255; }
     }
 
     private static SE_RidingCropBleed CreateBleed(CropDef tier, float damagePerSecond)
@@ -247,13 +265,13 @@ internal static class CropItems
             bleed.m_name = "Bleeding";
             bleed.m_tooltip = "Bleeding: " + damagePerSecond.ToString("0.#") + " damage per second for " + CropBalance.BleedDurationSeconds.ToString("0.#") + " seconds.";
             // The icon is filled in once the crop's inventory icon has been rendered (see RenderIcon).
-            if (!ItemManager.Instance.AddStatusEffect(new CustomStatusEffect(bleed, false)))
+            if (!KyStatusEffects.Add(bleed))
             {
-                ModLog.Warn("CropItems: Jotunn did not accept the bleed effect '" + bleed.name + "'; '" + tier.PrefabName + "' will not make targets bleed.");
+                ModLog.Warn("CropItems: KydlCore did not accept the bleed effect '" + bleed.name + "'; '" + tier.PrefabName + "' will not make targets bleed.");
                 return null;
             }
 
-            return bleed;
+            { var returnedAt274 = bleed; if (RuleLog.IsOn()) ModLog.Verbose($"CropItems.CreateBleed: returns {returnedAt274} (line 274)"); return returnedAt274; }
         }
         catch (Exception ex)
         {
@@ -315,6 +333,7 @@ internal static class CropItems
 
     private static void ApplyAlignment()
     {
+        if (RuleLog.IsOn()) ModLog.Verbose($"CropItems.ApplyAlignment: {Visuals.Count} visual(s), rotation=({RotationX}, {RotationY}, {RotationZ}) degrees, grip offset={GripOffset} m, scale={ModelScale}");
         Quaternion rotation = Quaternion.Euler(RotationX, RotationY, RotationZ);
         foreach (Transform t in Visuals)
         {
@@ -345,7 +364,7 @@ internal static class CropItems
         {
             material.SetTexture(property, null);
             material.DisableKeyword(keyword);
-            return;
+            { if (RuleLog.IsOn()) ModLog.Verbose($"CropItems.SetTexture: returns (line 367) - inputs (material={material}, property={property}, texture={texture}, keyword={keyword})"); return; }
         }
 
         material.SetTexture(property, texture);

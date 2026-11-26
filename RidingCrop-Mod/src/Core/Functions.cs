@@ -1,3 +1,4 @@
+using RidingCrop.Core;
 namespace RidingCrop;
 
 /// <summary>Pure rules that need no game types (unit-tested).</summary>
@@ -9,6 +10,7 @@ internal static class Functions
     /// <returns>True when the functionality should run.</returns>
     internal static bool IsOn(bool enableAll, bool own)
     {
-        return enableAll && own;
+        if (RuleLog.IsOn()) RuleLog.Verbose($"Functions.IsOn(enableAll={enableAll}, own={own})");
+        { var returnedAt14 = enableAll && own; if (RuleLog.IsOn()) RuleLog.Verbose($"Functions.IsOn: returns {returnedAt14} (line 14)"); return returnedAt14; }
     }
 }

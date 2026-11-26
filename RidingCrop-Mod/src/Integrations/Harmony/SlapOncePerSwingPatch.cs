@@ -1,6 +1,7 @@
 using HarmonyLib;
 using KydlCore.Common;
 using UnityEngine;
+using RidingCrop.Core;
 
 namespace RidingCrop;
 
@@ -23,14 +24,14 @@ internal static class SlapOncePerSwingPatch
         EffectList.EffectData[] entries = __instance == null ? null : __instance.m_effectPrefabs;
         if (entries == null)
         {
-            return;
+            { if (RuleLog.IsOn()) ModLog.Every("SlapOncePerSwingPatch.Prefix:27", 2d, $"SlapOncePerSwingPatch.Prefix: returns (line 27) - inputs (__instance={__instance})"); return; }
         }
 
         GameObject whoosh = CropSounds.WhooshPrefab;
         GameObject slap = CropSounds.SlapPrefab;
         if (whoosh == null && slap == null)
         {
-            return;
+            { if (RuleLog.IsOn()) ModLog.Every("SlapOncePerSwingPatch.Prefix:34", 2d, $"SlapOncePerSwingPatch.Prefix: returns (line 34) - inputs (__instance={__instance})"); return; }
         }
 
         for (int i = 0; i < entries.Length; i++)

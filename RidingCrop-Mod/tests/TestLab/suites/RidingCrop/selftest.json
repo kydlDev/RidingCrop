@@ -18,6 +18,10 @@
       "name": "ridingcrop.selftest",
       "notContains": "FAIL",
       "contains": "PASS"
+    },
+    {
+      "do": "console",
+      "command": "killall"
     }
   ],
   "asserts": [

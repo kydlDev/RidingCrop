@@ -139,6 +139,10 @@
       },
       "expect": 4,
       "label": "RidingCrop_V5 max quality"
+    },
+    {
+      "do": "console",
+      "command": "killall"
     }
   ],
   "asserts": [
