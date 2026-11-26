@@ -1,3 +1,4 @@
+using KydlCore.Common;
 using BepInEx.Configuration;
 
 namespace RidingCrop;

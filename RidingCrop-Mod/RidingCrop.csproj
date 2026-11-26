@@ -8,6 +8,8 @@
   <Import Project="..\..\Claude\shared\Kydl.Mod.props" />
 
   <PropertyGroup>
+    <!-- KydlCore 1.2.0: no Jotunn (MIGRATION_PLAN part 0); Claude\shared\Kydl.Mod.props skips the Jotunn reference -->
+    <KydlNoJotunn>true</KydlNoJotunn>
     <AssemblyName>RidingCrop</AssemblyName>
     <RootNamespace>RidingCrop</RootNamespace>
     <PackageId>RidingCrop</PackageId>

@@ -2,8 +2,8 @@ using System.IO;
 using System.Reflection;
 using BepInEx;
 using HarmonyLib;
-using Jotunn.Utils;
 using KydlCore.Common;
+using RidingCrop.Configuration;
 using RidingCrop.Bootstrap;
 
 namespace RidingCrop;
@@ -13,17 +13,15 @@ namespace RidingCrop;
 /// Order in Awake matters: log first, then the config, then the features (the skill must exist before the game creates its Skills object).
 /// </summary>
 [BepInPlugin(ModGuid, ModName, ModVersion)]
-[BepInDependency(Jotunn.Main.ModGuid)]
-[BepInDependency(KydlCore.Bootstrap.Plugin.ModGuid, "1.1.1")]     // the KY hub (manifest: KydlDev-KydlCore-1.1.1, same version)
-// New items = everyone on a server needs the mod with the exact same version, otherwise they can't see or hold them.
-[NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Patch)]
+[BepInDependency(KydlCore.Bootstrap.Plugin.ModGuid, "1.2.0")]     // the KY hub (manifest: KydlDev-KydlCore-1.1.3, same version)
+// Network check: ModSync.cs (KydlCore 1.2.0 KyNetwork, EveryoneMustHave; no Jotunn - MIGRATION_PLAN part 0).
 public class Plugin : BaseUnityPlugin
 {
     // ModGuid never changes (it is the config file name: BepInEx/config/com.kydldev.RidingCrop.cfg).
     // ModVersion = manifest.json version_number = newest CHANGELOG heading (tests check it).
     public const string ModGuid = "com.kydldev.RidingCrop";
     public const string ModName = "RidingCrop";
-    public const string ModVersion = "2.0.1";
+    public const string ModVersion = "2.0.2";
 
     private Harmony _harmony;
     private ConfigReloader _cfgWatcher;
@@ -38,6 +36,10 @@ public class Plugin : BaseUnityPlugin
         ModLog.Info(ModName + " " + ModVersion + " loaded (dll built " + File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location).ToString("yyyy-MM-dd HH:mm:ss") + ")");
 
         ModSettings.Bind(Config);
+
+        int adminShared = ModSync.ShareAdminOnly(Config);     // network check + server-decided settings (KydlCore KyNetwork)
+        RidingCrop.Core.RuleLog.Sink = ModLog.Verbose;   // the pure code logs through ModLog (PROJECT_RULES 8, KydlCore D-103)
+        RidingCrop.Core.RuleLog.DebugOn = () => ModSettings.DebugLog != null && ModSettings.DebugLog.Value;
         ConfigMigration.Run(Config);
         _cfgWatcher = new ConfigReloader(Config);
 

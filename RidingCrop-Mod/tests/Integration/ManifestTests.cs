@@ -72,14 +72,14 @@ public class ManifestTests
     }
 
     [Test]
-    public void Manifest_Dependencies_UseFormatAndContainBepInExAndJotunn()
+    public void Manifest_Dependencies_UseFormatAndContainBepInExAndNoJotunn()
     {
         var deps = Dependencies();
         foreach (var d in deps) Assert.That(DependencyFormat.IsMatch(d), Is.True, "bad dependency string: " + d);
         using (Assert.EnterMultipleScope())
         {
             Assert.That(deps.Any(d => d.IndexOf("BepInExPack_Valheim", StringComparison.OrdinalIgnoreCase) >= 0), Is.True);
-            Assert.That(deps.Any(d => d.IndexOf("Jotunn", StringComparison.OrdinalIgnoreCase) >= 0), Is.True);
+            Assert.That(deps.Any(d => d.IndexOf("Jotunn", StringComparison.OrdinalIgnoreCase) >= 0), Is.False, "KydlCore 1.2.0: no KydlDev mod depends on Jotunn");
         }
     }
 
@@ -113,18 +113,6 @@ public class ManifestTests
         Assert.That(declared, Is.LessThanOrEqualTo(newest), "the mod asks for a newer KydlCore than the newest one (" + newest + ")");
     }
 
-    [Test]
-    public void Manifest_JotunnDependency_IsNotNewerThanTheJotunnTheModIsBuiltAgainst()
-    {
-        var dep = Dependencies().First(d => d.IndexOf("Jotunn", StringComparison.OrdinalIgnoreCase) >= 0);
-        var declared = Version.Parse(dep.Substring(dep.LastIndexOf('-') + 1));
-        var dll = Path.Combine(TestPaths.RefDir, "Jotunn.dll");
-        Assume.That(File.Exists(dll), "Jotunn.dll not in the reference folder");
-        var built = Version.Parse(FileVersionInfo.GetVersionInfo(dll).FileVersion);
-
-        Assert.That(new Version(declared.Major, declared.Minor, declared.Build), Is.LessThanOrEqualTo(new Version(built.Major, built.Minor, built.Build)),
-            "manifest asks for a newer Jotunn than the one the mod is compiled against");
-    }
 
     [Test]
     public void Package_RequiredFiles_Exist()
