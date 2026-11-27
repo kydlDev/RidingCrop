@@ -66,8 +66,6 @@ Keep `[General] Enable Mod` and `[Crops] Enable` the same on the server and all 
 | 6 | Askvin worthy | `RidingCrop_V2` | 10 Askvin Hide, 2 Charred Bone, 5 Ashwood |
 | 7 | Seal the deal! | `RidingCrop_V5` | 10 Moose Hide, 2 Seal Pelt, 5 Timberwood |
 
-Item ids also work with the console `spawn` command (devcommands).
-
 ## Crafting stations
 
 Each upgrade needs one station level more than the previous quality (same station).
@@ -134,12 +132,7 @@ Every upgrade adds a flat **+6 blunt damage** and a flat **+40 durability** on e
 
 ## Skill
 
-All crops train the **RidingCrop** skill (shown in the Skills window). Dev-command test:
-
-```
-devcommands
-raiseskill ridingcrop 50
-```
+All crops train the **RidingCrop** skill (shown in the Skills window).
 
 ## Sounds
 
