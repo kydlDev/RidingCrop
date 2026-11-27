@@ -1,0 +1,21 @@
+{
+  "name": "visual-icons",
+  "description": "Rule 42 (user 2026-11-27): the icons of every item / piece RidingCrop contributes to KY-Items exist and are not small (hook), and a GameProbe screenshot of the KY-Items grid filtered to this mod is taken for a person to LOOK at (icon cut off, wrong colour, empty frame); the view and the filter are reset at the end",
+  "asserts": [ { "check": "noErrors", "source": "RidingCrop" } ],
+  "steps": [
+    { "do": "hook", "name": "ridingcrop.arena", "contains": "arena at", "label": "start on the arena spot" },
+    { "do": "wait", "until": { "check": "hook", "name": "kc.itemsReady", "args": {}, "expect": true }, "timeout": 20 },
+    { "do": "hook", "name": "kc.itemsIcons", "args": { "mod": "com.kydldev.RidingCrop", "minPx": 128 }, "regex": "^entries ([1-9][0-9]*), with icon \\1, smallest [0-9]+x[0-9]+, below 128 0$", "label": "every item of the mod has an icon of at least 128 px" },
+    { "do": "hook", "name": "kc.kyItemsFilter", "args": { "mod": "com.kydldev.RidingCrop" }, "regex": "^[1-9][0-9]*$", "label": "the KY-Items page lists only this mod's items" },
+    { "do": "hook", "name": "kc.kyItemsView", "args": { "grid": true }, "contains": "grid", "label": "the grid view is on" },
+    { "do": "hook", "name": "kc.hubOpen", "args": { "mod": "com.kydldev.KydlCore", "tab": "ky-items" }, "expect": true, "label": "open the KY-Items page" },
+    { "do": "wait", "seconds": 2 },
+    { "do": "invoke", "method": "Kydl.GameProbe.ProbeApi.Screenshot", "label": "GameProbe shot of the mod's icons in the grid" },
+    { "do": "wait", "seconds": 1.5 },
+    { "do": "hook", "name": "kc.hubClose", "expect": false, "label": "close the hub" },
+    { "do": "hook", "name": "kc.kyItemsFilter", "args": { "mod": "" }, "regex": "^[0-9]+$", "label": "all mods are listed again" },
+    { "do": "hook", "name": "kc.kyItemsView", "args": { "grid": false }, "contains": "list", "label": "back to the list view" },
+    { "do": "console", "command": "killall" }
+  ],
+  "timeout": 90
+}

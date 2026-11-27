@@ -63,6 +63,7 @@
   ],
   "resetBetweenTests": true,
   "tests": [
+    "visual-icons",
     "selftest",
     "hub-page",
     "feature-toggle",
