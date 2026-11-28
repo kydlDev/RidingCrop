@@ -12,6 +12,7 @@
     <!-- KydlCore.Core (shared pure contracts) -->
     <Compile Include="$(MSBuildThisFileDirectory)..\..\..\..\KydlCore\KydlCore-Mod\src\Shared\Core\**\*.cs" Link="Kydl\Core\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="..\..\src\Features\*\Domain\**\*.cs" Link="Mod\Domain\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Core\RuleLog.cs" Link="Mod\Core\RuleLog.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
